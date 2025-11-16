@@ -1,0 +1,201 @@
+<!DOCTYPE html>
+<html lang="it">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Controller Ambréss</title>
+<style>
+body {
+  margin: 0;
+  padding: 0;
+  font-family: Arial;
+  background: #d92b2d;
+  color: white;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  text-align: center;
+  min-height: 100vh;
+}
+#logo img {
+  width: 85%;
+  max-width: 300px;
+  height: auto;
+  display: block;
+  margin: 60px auto 30px auto; /* centrata e visibile */
+}
+#modalitaSelector {
+  margin-top: 50px;
+  display: none;
+}
+#modalitaSelector h2 {
+  font-size: 2.2em;
+  margin-bottom: 30px;
+  text-shadow: 0 0 12px #000;
+}
+#contatoreDisplay {
+  display: none;
+  flex-direction: column;
+  align-items: center;
+  width: 100%;
+}
+#numero {
+  font-size: 20vw;
+  font-weight: 900;
+  margin: 10px 0;
+  text-shadow: 0 0 15px #000;
+}
+.btns {
+  display: flex;
+  gap: 24px;
+  margin-top: 20px;
+  flex-wrap: wrap;
+}
+button {
+  padding: 20px 38px;
+  font-size: 32px;
+  font-weight: bold;
+  border: none;
+  border-radius: 15px;
+  cursor: pointer;
+  background: white;
+  color: #d92b2d;
+  box-shadow: 0 0 17px #000;
+  transition: background 0.2s;
+}
+button:active {
+  background: #ff8688;
+}
+#modalitaLabel {
+  display: block;
+  margin-top: 50px;
+  font-size: 24px;
+  font-weight: bold;
+  text-shadow: 0 0 10px #000;
+}
+.menuChoiceBtn {
+  padding: 26px 60px;
+  font-size: 34px;
+  font-weight: bold;
+  border: none;
+  border-radius: 15px;
+  cursor: pointer;
+  background: white;
+  color: #d92b2d;
+  box-shadow: 0 0 17px #000;
+  margin: 0 20px;
+  margin-bottom: 28px;
+  margin-top: 10px;
+}
+.menuChoiceBtn:active {
+  background: #ff8688;
+}
+#modalitaBtn {
+  margin: 40px 0 20px 0;
+  font-size: 26px;
+  padding: 14px 36px;
+  background: #fff;
+  color: #d92b2d;
+  box-shadow: 0 0 12px #000;
+  border-radius: 14px;
+  font-weight: bold;
+  border: none;
+  cursor: pointer;
+}
+#modalitaBtn:active {
+  background: #ff8688;
+}
+</style>
+</head>
+<body>
+<div id="logo">
+  <img src="https://i.postimg.cc/sgTLtXx8/Progetto-senza-titolo-1.png" alt="Logo Ambréss">
+</div>
+
+<button id="modalitaBtn">CAMBIA MODALITÀ</button>
+
+<div id="modalitaSelector">
+  <h2>SCEGLI MODALITÀ</h2>
+  <button class="menuChoiceBtn" id="scegliContatore">Contatore & SlideShow</button>
+  <button class="menuChoiceBtn" id="scegliMenu">Menu Immagini</button>
+</div>
+
+<div id="contatoreDisplay">
+  <div id="numero">01</div>
+  <div class="btns">
+    <button id="meno">−1</button>
+    <button id="reset">RESET</button>
+    <button id="piu">+1</button>
+  </div>
+  <span id="modalitaLabel">MODALITÀ: CONTATORE & SLIDESHOW</span>
+</div>
+
+<!-- Firebase -->
+<script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-database-compat.js"></script>
+<script>
+const firebaseConfig = {
+  apiKey: "AIzaSyBmqbjRSvefCr43X1AfWFBgpljU4XhNItc",
+  authDomain: "ambress-display.firebaseapp.com",
+  databaseURL: "https://ambress-display-default-rtdb.europe-west1.firebasedatabase.app",
+  projectId: "ambress-display",
+  storageBucket: "ambress-display.firebasestorage.app",
+  messagingSenderId: "3096916567",
+  appId: "1:3096916567:web:fe04981e9d3623a2306912",
+  measurementId: "G-PXF4M3HMFT"
+};
+firebase.initializeApp(firebaseConfig);
+const database = firebase.database();
+const turnoRef = database.ref("turno");
+const modalitaRef = database.ref("modalitaDisplay");
+const numero = document.getElementById("numero");
+const modalitaLabel = document.getElementById("modalitaLabel");
+const modalitaSelector = document.getElementById("modalitaSelector");
+const contatoreDisplay = document.getElementById("contatoreDisplay");
+const modalitaBtn = document.getElementById("modalitaBtn");
+
+function showModSelector() {
+  contatoreDisplay.style.display = "none";
+  modalitaSelector.style.display = "block";
+}
+
+modalitaBtn.onclick = () => showModSelector();
+
+document.getElementById("scegliContatore").onclick = () => {
+  modalitaRef.set("contatore");
+  modalitaSelector.style.display = "none";
+  contatoreDisplay.style.display = "flex";
+  modalitaLabel.textContent = "MODALITÀ: CONTATORE & SLIDESHOW";
+};
+document.getElementById("scegliMenu").onclick = () => {
+  modalitaRef.set("menu");
+  modalitaSelector.style.display = "none";
+  contatoreDisplay.style.display = "none";
+};
+
+modalitaRef.on("value", snap => {
+  const val = snap.val();
+  if (val === "contatore") {
+    modalitaLabel.textContent = "MODALITÀ: CONTATORE & SLIDESHOW";
+    contatoreDisplay.style.display = "flex";
+  } else if (val === "menu") {
+    modalitaLabel.textContent = "MODALITÀ: SOLO MENÙ IMMAGINI";
+    contatoreDisplay.style.display = "none";
+  }
+});
+
+turnoRef.on("value", snap => {
+  numero.textContent = snap.val().toString().padStart(2,"0");
+});
+function aggiornaTurno(valore) {
+  turnoRef.set(valore);
+}
+document.getElementById("piu").onclick = () => aggiornaTurno(Number(numero.textContent) + 1);
+document.getElementById("meno").onclick = () => aggiornaTurno(Math.max(0, Number(numero.textContent) - 1));
+document.getElementById("reset").onclick = () => aggiornaTurno(0);
+
+// Avvio mostra selector
+showModSelector();
+</script>
+</body>
+</html>
