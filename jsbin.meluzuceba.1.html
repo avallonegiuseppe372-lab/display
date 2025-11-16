@@ -1,0 +1,243 @@
+<!DOCTYPE html>
+<!--
+Created using JS Bin
+http://jsbin.com
+
+Copyright (c) 2025 by anonymous (http://jsbin.com/meluzuceba/1/edit)
+
+Released under the MIT license: http://jsbin.mit-license.org
+-->
+<meta name="robots" content="noindex">
+<html lang="it">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Ambréss Pizzeria Display</title>
+<style>
+body {
+  margin: 0;
+  display: flex;
+  height: 100vh;
+  font-family: Arial, sans-serif;
+  background: #e93222;
+}
+.left {
+  display: flex;
+  flex-direction: column;
+  justify-content: flex-start;
+  align-items: center;
+  background: #e83c29; /* sfondo aggiornato */
+  color: white;
+  width: 35%;
+  padding-top: 50px; /* leggermente più in alto */
+  position: relative;
+}
+#logo img {
+  width: 125%;
+  max-width: none;
+  height: auto;
+  object-fit: contain;
+  margin-bottom: 10px;
+  position: relative;
+  left: -20px; /* leggermente a sinistra */
+}
+#immagine-sotto-logo {
+  display: block;
+  margin: 0 auto 10px auto; /* centrata con margine sotto */
+  width: 80%; 
+  height: auto;
+}
+#numero {
+  font-family: 'Arial Black', sans-serif;
+  font-size: 18vw;
+  font-weight: 900;
+  text-shadow: 0 0 15px #ffffff, 0 0 30px #000000, 0 0 45px rgba(0,0,0,0.5);
+  margin: 0;
+  margin-top: 10px; /* leggermente più in alto */
+  position: relative;
+  left: 0;
+}
+.divider {
+  width: 4px;
+  background: #000000;
+}
+.right {
+  flex: 1;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  overflow: hidden;
+  background-image: url("https://i.postimg.cc/0Qs7gMCb/giusto.png");
+  background-size: cover;
+  background-position: center;
+  position: relative;
+}
+#main-image {
+  max-width: 100vw;
+  max-height: 100vh;
+  width: auto;
+  height: auto;
+  object-fit: contain;
+  object-position: center;
+  transition: opacity 1.5s ease-in-out;
+  display: block;
+  margin: 0 auto;
+}
+#audioBeep {
+  display: none;
+}
+</style>
+</head>
+<body>
+
+<div class="left" id="displayLeft">
+  <div id="logo">
+    <img src="https://i.postimg.cc/284BpKR8/Progetto-senza-titolo-(2).gif" alt="Logo Ambréss">
+  </div>
+  <img id="immagine-sotto-logo" src="https://i.postimg.cc/jd2htv5d/download-removebg-preview.png" alt="immagine sotto logo">
+  <div id="numero">01</div>
+</div>
+
+<div class="divider" id="displayDivider"></div>
+<div class="right">
+  <img id="main-image" src="" alt="Slideshow">
+</div>
+
+<audio id="audioBeep">
+  <source src="https://github.com/nancyloffredo87-hub/beep/blob/3d81741adeb9ac9edbe2b4c755bb0f2ebedacd8a/WhatsApp%20Audio%202025-11-14%20at%2011.12.49.mpeg?raw=true" type="audio/mpeg">
+</audio>
+
+<!-- Firebase -->
+<script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-database-compat.js"></script>
+<script>
+const firebaseConfig = {
+  apiKey: "AIzaSyBmqbjRSvefCr43X1AfWFBgpljU4XhNItc",
+  authDomain: "ambress-display.firebaseapp.com",
+  databaseURL: "https://ambress-display-default-rtdb.europe-west1.firebasedatabase.app",
+  projectId: "ambress-display",
+  storageBucket: "ambress-display.firebasestorage.app",
+  messagingSenderId: "3096916567",
+  appId: "1:3096916567:web:fe04981e9d3623a2306912",
+  measurementId: "G-PXF4M3HMFT"
+};
+
+firebase.initializeApp(firebaseConfig);
+const database = firebase.database();
+const turnoRef = database.ref('turno');
+const modalitaRef = database.ref("modalitaDisplay");
+
+// Solo queste due immagini per menu immagini
+const menuImmagini = [
+  "https://github.com/nancyloffredo87-hub/MENU/raw/5906fedfa6e5b466614829df73b433b9a5bfbcc4/menu%2010_15.png",
+  "https://github.com/nancyloffredo87-hub/MENU/raw/5906fedfa6e5b466614829df73b433b9a5bfbcc4/MENU35.png"
+];
+let menuIdx = 0;
+let menuTimeout = null;
+
+function mostraMenuSlides() {
+  function nextImg() {
+    mainImage.style.transition = "opacity 1.5s";
+    mainImage.style.opacity = 0;
+    setTimeout(() => {
+      mainImage.src = menuImmagini[menuIdx];
+      mainImage.style.maxWidth = "100vw";
+      mainImage.style.maxHeight = "100vh";
+      mainImage.style.width = "100%";
+      mainImage.style.height = "100%";
+      mainImage.style.objectFit = "contain";
+      mainImage.style.position = "static";
+      mainImage.style.margin = "auto";
+      mainImage.style.opacity = 1;
+      menuIdx = (menuIdx + 1) % menuImmagini.length;
+      menuTimeout = setTimeout(nextImg, 30000);
+    }, 1300);
+  }
+  nextImg();
+}
+
+// Tutte le altre immagini nello slideshow
+const immagini = [
+  { url: "https://i.postimg.cc/pX2R6Wb7/menu.png", durata: 10000 },
+  { url: "https://i.postimg.cc/qq831kKX/manu22.png", durata: 10000 },
+  { url: "https://i.postimg.cc/P5rs2Cj7/diavol.png", durata: 5000 },
+  { url: "https://i.postimg.cc/9Q83ScXj/fritto.png", durata: 5000 },
+  { url: "https://i.postimg.cc/L8Cd7m4F/fung.png", durata: 5000 },
+  { url: "https://i.postimg.cc/CxPytwMS/margh.png", durata: 5000 },
+  { url: "https://i.postimg.cc/hGXFRNhn/marinara.png", durata: 5000 },
+  { url: "https://i.postimg.cc/63r8xBWh/nut2.png", durata: 5000 },
+  { url: "https://i.postimg.cc/W4dRcxts/prov.png", durata: 5000 },
+  { url: "https://i.postimg.cc/43YCRjnN/sals.png", durata: 5000 },
+  { url: "https://i.postimg.cc/rmRZjY9S/scarole-3.png", durata: 15000 },
+  { url: "https://i.postimg.cc/gj5FM6CD/wurstel-1.png", durata: 5000 }
+];
+
+let index = 0;
+let slideTimeout = null;
+const mainImage = document.getElementById("main-image");
+const numeroDisplay = document.getElementById('numero');
+const beep = document.getElementById("audioBeep");
+let ultimo = null;
+
+function cambiaImmagine() {
+  mainImage.style.opacity = 0;
+  setTimeout(() => {
+    mainImage.src = immagini[index].url;
+    mainImage.style.width = (index === 0 || index === 1) ? "63%" : "67%";
+    mainImage.style.height = "";
+    mainImage.style.objectFit = "contain";
+    mainImage.style.position = "relative";
+    mainImage.style.margin = "";
+    mainImage.style.opacity = 1;
+    slideTimeout = setTimeout(cambiaImmagine, immagini[index].durata);
+    index = (index + 1) % immagini.length;
+  }, 1000);
+}
+
+function resetSlideshow() {
+  clearTimeout(slideTimeout);
+  clearTimeout(menuTimeout);
+}
+
+modalitaRef.on("value", snap => {
+  const modalita = snap.val();
+  resetSlideshow();
+  if (!modalita || modalita === "") {
+    document.getElementById("displayLeft").style.display = "none";
+    document.getElementById("displayDivider").style.display = "none";
+    mainImage.style.display = "none";
+    return;
+  }
+  mainImage.style.display = "";
+  if (modalita === "menu") {
+    document.getElementById("displayLeft").style.display = "none";
+    document.getElementById("displayDivider").style.display = "none";
+    menuIdx = 0;
+    mostraMenuSlides();
+  } else if (modalita === "contatore") {
+    document.getElementById("displayLeft").style.display = "";
+    document.getElementById("displayDivider").style.display = "";
+    index = 0;
+    mainImage.style.width = "63%";
+    mainImage.style.height = "";
+    mainImage.style.objectFit = "contain";
+    mainImage.style.position = "relative";
+    mainImage.style.margin = "";
+    mainImage.src = immagini[0].url;
+    setTimeout(cambiaImmagine, immagini[0].durata);
+  }
+});
+
+// Aggiorna numero contatore
+turnoRef.on("value", snap => {
+  let nuovo = snap.val().toString().padStart(2,"0");
+  if (ultimo !== null && ultimo !== nuovo) {
+    beep.currentTime = 0;
+    beep.play();
+  }
+  numeroDisplay.textContent = nuovo;
+  ultimo = nuovo;
+});
+</script>
+</body>
+</html>
